@@ -1,0 +1,15 @@
+node_modules
+.nuxt
+.output
+.nitro
+.cache
+dist
+dev.log
+.env
+.env.*
+!.env.example
+
+.vercel
+public/images/concepts/*.png
+tmp-*.png
+wenchuang-b2bsite-github.zip
