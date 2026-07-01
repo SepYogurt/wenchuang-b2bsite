@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { manufacturingCapabilities, qualitySteps, surfaceFinishes } from '~/data/site'
+import { buyerSegments, manufacturingCapabilities, qualitySteps, surfaceFinishes } from '~/data/site'
 import { products } from '~/data/products'
 
 useSeoMeta({
@@ -59,6 +59,26 @@ const advantages = [
       />
       <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <ProductCard v-for="product in products" :key="product.slug" :product="product" />
+      </div>
+    </div>
+  </section>
+
+  <section class="py-16 md:py-24">
+    <div class="container-shell">
+      <SectionTitle
+        eyebrow="Buyer Scenarios"
+        title="Support for different cosmetic packaging teams"
+        description="Whether you are building a new beauty brand line, sourcing for a packaging company, or matching components for OEM production, the RFQ flow is organized around practical project details."
+      />
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        <article
+          v-for="segment in buyerSegments"
+          :key="segment.title"
+          class="rounded-lg border border-platinum bg-white p-6"
+        >
+          <h3 class="text-lg font-semibold text-ink">{{ segment.title }}</h3>
+          <p class="mt-3 text-sm leading-6 text-graphite/75">{{ segment.description }}</p>
+        </article>
       </div>
     </div>
   </section>

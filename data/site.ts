@@ -8,6 +8,14 @@ export const navigation = [
   { label: 'Contact', to: '/contact' }
 ]
 
+export const site = {
+  url: 'https://b2bsite.vercel.app',
+  name: 'WenChuang',
+  title: 'WenChuang | Cosmetic Metal Packaging Manufacturer',
+  description: 'Custom metal cosmetic packaging components for fragrance and color cosmetic projects, including perfume sprayers, caps, compact cases, lipstick shells, and OEM metal parts.',
+  ogImage: '/images/concepts/hero-metal-packaging.jpg'
+}
+
 export const manufacturingCapabilities = [
   'Mold development',
   'Metal stamping',
@@ -18,6 +26,21 @@ export const manufacturingCapabilities = [
   'Anodizing',
   'Assembly',
   'Quality inspection'
+]
+
+export const buyerSegments = [
+  {
+    title: 'Beauty Brands',
+    description: 'For fragrance and color cosmetic teams developing premium launch packaging or limited-edition metal details.'
+  },
+  {
+    title: 'Packaging Companies',
+    description: 'For packaging houses that need a metal component manufacturing partner for structure, finish, and export delivery.'
+  },
+  {
+    title: 'OEM / Filling Factories',
+    description: 'For production partners matching metal shells, caps, sprayers, compact structures, and assembly-ready components.'
+  }
 ]
 
 export const surfaceFinishes = [

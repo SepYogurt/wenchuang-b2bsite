@@ -7,9 +7,14 @@ interface RfqPayload {
   email?: string
   country?: string
   productType?: string
+  sourceProductSlug?: string
   material?: string
   surfaceFinish?: string
+  dimensions?: string
   quantity?: string
+  targetMarket?: string
+  timeline?: string
+  attachmentLink?: string
   message?: string
   website?: string
 }
@@ -61,9 +66,14 @@ export default defineEventHandler(async (event) => {
     email: normalize(body.email, 200).toLowerCase(),
     country: normalize(body.country, 100),
     productType: normalize(body.productType, 120),
+    sourceProductSlug: normalize(body.sourceProductSlug, 120),
     material: normalize(body.material, 150),
     surfaceFinish: normalize(body.surfaceFinish, 150),
+    dimensions: normalize(body.dimensions, 200),
     quantity: normalize(body.quantity, 100),
+    targetMarket: normalize(body.targetMarket, 120),
+    timeline: normalize(body.timeline, 160),
+    attachmentLink: normalize(body.attachmentLink, 500),
     message: normalize(body.message, 5000)
   }
 
@@ -81,6 +91,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (rfq.attachmentLink && !/^https?:\/\//i.test(rfq.attachmentLink)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Please provide a valid drawing or reference link.'
+    })
+  }
+
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     console.error('RFQ email delivery is unavailable: RESEND_API_KEY is not configured.')
@@ -93,6 +110,7 @@ export default defineEventHandler(async (event) => {
   const recipient = process.env.RFQ_TO_EMAIL || companyInfo.email
   const sender = process.env.RFQ_FROM_EMAIL || 'WenChuang Website <onboarding@resend.dev>'
   const resend = new Resend(apiKey)
+  const rfqReference = `WC-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
   const safe = Object.fromEntries(
     Object.entries(rfq).map(([key, value]) => [key, escapeHtml(value)])
   ) as typeof rfq
@@ -101,7 +119,7 @@ export default defineEventHandler(async (event) => {
     from: sender,
     to: recipient,
     replyTo: rfq.email,
-    subject: `New RFQ: ${rfq.productType || 'Metal Cosmetic Packaging'} - ${rfq.company || rfq.name}`,
+    subject: `[${rfqReference}] New RFQ: ${rfq.productType || 'Metal Cosmetic Packaging'} - ${rfq.company || rfq.name}`,
     html: `
       <!doctype html>
       <html lang="en">
@@ -110,16 +128,23 @@ export default defineEventHandler(async (event) => {
             <div style="background:#10131a;padding:24px;color:#ffffff">
               <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#c7a76a">WenChuang Website</div>
               <h1 style="margin:10px 0 0;font-size:24px">New RFQ Received</h1>
+              <p style="margin:10px 0 0;color:#d1d5db;font-size:13px">Reference: ${rfqReference}</p>
             </div>
             <table role="presentation" style="width:100%;border-collapse:collapse;background:#ffffff">
+              ${row('RFQ Reference', rfqReference)}
               ${row('Name', safe.name)}
               ${row('Company', safe.company)}
               ${row('Email', `<a href="mailto:${safe.email}" style="color:#111827">${safe.email}</a>`)}
               ${row('Country', safe.country)}
               ${row('Product Type', safe.productType)}
+              ${row('Source Product Slug', safe.sourceProductSlug)}
               ${row('Material', safe.material)}
               ${row('Surface Finish', safe.surfaceFinish)}
+              ${row('Size / Dimensions', safe.dimensions)}
               ${row('Estimated Quantity', safe.quantity)}
+              ${row('Target Market', safe.targetMarket)}
+              ${row('Project Timeline', safe.timeline)}
+              ${row('Drawing / Reference Link', safe.attachmentLink ? `<a href="${safe.attachmentLink}" style="color:#111827">${safe.attachmentLink}</a>` : '')}
               ${row('Message', safe.message.replaceAll('\n', '<br>'))}
             </table>
             <p style="margin:18px 0 0;color:#6b7280;font-size:12px;line-height:1.6">
@@ -143,6 +168,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    id: data?.id
+    id: rfqReference,
+    emailId: data?.id
   }
 })
